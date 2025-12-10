@@ -1,12 +1,14 @@
 #!/bin/bash
-# bughunter.sh - Automated Bug Hunting Pipeline dengan Tools Go
+# bughunter.sh - Final Version with Error Handling
+
+set -e  # Exit on error
 
 DOMAIN=$1
 OUTPUT_DIR="output/$DOMAIN"
 TOOLS_DIR="$HOME/go/bin"
-LOG_FILE="$OUTPUT_DIR/scan.log"
+LOG_FILE="$OUTPUT_DIR/scan_$(date +%Y%m%d_%H%M%S).log"
 
-# Tambahkan PATH untuk tools Go
+# Add Go tools to PATH
 export PATH="$PATH:$TOOLS_DIR"
 
 # Colors
@@ -17,97 +19,110 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # Banner
-echo -e "${GREEN}"
-cat << "EOF"
+print_banner() {
+    echo -e "${GREEN}"
+    cat << "EOF"
 ╔══════════════════════════════════════════════════════╗
-║      BugHunterFlow - Enhanced Go Tools Edition       ║
-║         Integrated with: ffuf, nuclei, gau, etc.     ║
+║      BugHunterFlow - Automated Bug Hunting           ║
+║           GitHub: @essev92-1                         ║
 ╚══════════════════════════════════════════════════════╝
 EOF
-echo -e "${NC}"
+    echo -e "${NC}"
+}
 
-if [ -z "$DOMAIN" ]; then
-    echo "Usage: ./bughunter.sh example.com"
-    exit 1
-fi
-
-# Buat direktori output
-mkdir -p "$OUTPUT_DIR"
-
-# Fungsi log
+# Functions
 log() {
     echo -e "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
 }
 
-# Fungsi cek tool Go
-check_go_tool() {
-    if [ -f "$TOOLS_DIR/$1" ]; then
-        log "${GREEN}[✓] Tool $1 ditemukan di $TOOLS_DIR/${NC}"
-        return 0
-    elif command -v $1 &> /dev/null; then
-        log "${GREEN}[✓] Tool $1 ditemukan di PATH${NC}"
-        return 0
-    else
-        log "${RED}[!] Tool $1 tidak ditemukan${NC}"
-        return 1
+check_dependencies() {
+    log "${BLUE}[*] Checking dependencies...${NC}"
+    
+    # Check Python
+    if ! command -v python3 &> /dev/null; then
+        log "${RED}[!] Python3 not found. Please install python3${NC}"
+        exit 1
+    fi
+    
+    # Check Go tools
+    local missing_tools=()
+    local required_tools=("subfinder" "httpx" "nuclei" "ffuf")
+    
+    for tool in "${required_tools[@]}"; do
+        if ! command -v "$tool" &> /dev/null; then
+            missing_tools+=("$tool")
+        fi
+    done
+    
+    if [ ${#missing_tools[@]} -gt 0 ]; then
+        log "${YELLOW}[!] Missing tools: ${missing_tools[*]}${NC}"
+        log "${YELLOW}[!] Install with: go install github.com/projectdiscovery/[tool]@latest${NC}"
     fi
 }
 
-# Cek tools yang penting
-log "${BLUE}[*] Memeriksa tools Go yang tersedia...${NC}"
-check_go_tool "subfinder"
-check_go_tool "assetfinder"
-check_go_tool "httpx"
-check_go_tool "gau"
-check_go_tool "waybackurls"
-check_go_tool "nuclei"
-check_go_tool "ffuf"
-check_go_tool "dalfox"
-check_go_tool "hakrawler"
-check_go_tool "katana"
-check_go_tool "anew"
-check_go_tool "notify"
+print_summary() {
+    echo -e "\n${GREEN}════════════ SCAN SUMMARY ════════════${NC}"
+    echo -e "Target: ${BLUE}$DOMAIN${NC}"
+    echo -e "Output: ${BLUE}$OUTPUT_DIR${NC}"
+    echo -e "Log: ${BLUE}$LOG_FILE${NC}"
+    
+    if [ -d "$OUTPUT_DIR" ]; then
+        echo -e "\n${YELLOW}Generated Files:${NC}"
+        find "$OUTPUT_DIR" -type f -name "*.txt" -o -name "*.json" -o -name "*.md" | head -10
+    fi
+}
 
-# Mulai scanning
-log "${GREEN}[+] Memulai scan untuk $DOMAIN${NC}"
+# Main execution
+main() {
+    print_banner
+    
+    if [ -z "$DOMAIN" ]; then
+        echo "Usage: ./bughunter.sh example.com"
+        echo "Example: ./bughunter.sh hackerone.com"
+        exit 1
+    fi
+    
+    log "${GREEN}[+] Starting BugHunterFlow for: $DOMAIN${NC}"
+    
+    # Create output directory
+    mkdir -p "$OUTPUT_DIR"
+    
+    # Check dependencies
+    check_dependencies
+    
+    # Phase 1: Reconnaissance
+    log "${YELLOW}[*] Phase 1/6: Reconnaissance${NC}"
+    ./reconnaissance.sh "$DOMAIN" 2>&1 | tee -a "$LOG_FILE"
+    
+    # Phase 2: Web Technology Analysis
+    log "${YELLOW}[*] Phase 2/6: Technology Analysis${NC}"
+    python3 web_tech.py "$DOMAIN" 2>&1 | tee -a "$LOG_FILE"
+    
+    # Phase 3: Parameter Discovery
+    log "${YELLOW}[*] Phase 3/6: Parameter Discovery${NC}"
+    python3 param_finder.py "$DOMAIN" 2>&1 | tee -a "$LOG_FILE"
+    
+    # Phase 4: Bug Scanning
+    log "${YELLOW}[*] Phase 4/6: Bug Scanning${NC}"
+    python3 bug_scanner.py "$DOMAIN" 2>&1 | tee -a "$LOG_FILE"
+    
+    # Phase 5: Security Headers
+    log "${YELLOW}[*] Phase 5/6: Security Headers${NC}"
+    python3 header_checker.py "$DOMAIN" 2>&1 | tee -a "$LOG_FILE"
+    
+    # Phase 6: JavaScript Analysis
+    log "${YELLOW}[*] Phase 6/6: JavaScript Analysis${NC}"
+    python3 js_analyzer.py "$DOMAIN" 2>&1 | tee -a "$LOG_FILE"
+    
+    # Optional: Nuclei deep scan
+    if command -v nuclei &> /dev/null; then
+        log "${BLUE}[*] Running Nuclei deep scan (background)...${NC}"
+        nuclei -u "https://$DOMAIN" -severity medium,high,critical -o "$OUTPUT_DIR/nuclei_deep_scan.txt" -silent &
+    fi
+    
+    log "${GREEN}[+] Scan completed successfully!${NC}"
+    print_summary
+}
 
-# Fase 1: Reconnaissance dengan tools Go
-log "${YELLOW}[*] Fase 1: Reconnaissance (Enhanced)${NC}"
-./reconnaissance.sh "$DOMAIN" 2>&1 | tee -a "$LOG_FILE"
-
-# Fase 2: Analisis Aplikasi Web
-log "${YELLOW}[*] Fase 2: Analisis Teknologi Web${NC}"
-python3 web_tech.py "$DOMAIN" 2>&1 | tee -a "$LOG_FILE"
-
-# Fase 3: Cari Parameter & Endpoint dengan tools Go
-log "${YELLOW}[*] Fase 3: Mencari Parameter & Endpoint (Enhanced)${NC}"
-python3 param_finder.py "$DOMAIN" 2>&1 | tee -a "$LOG_FILE"
-
-# Fase 4: Uji Bug Umum dengan nuclei dan dalfox
-log "${YELLOW}[*] Fase 4: Scanning Bug dengan Nuclei & Dalfox${NC}"
-python3 bug_scanner.py "$DOMAIN" 2>&1 | tee -a "$LOG_FILE"
-
-# Fase 5: Cek Security Headers
-log "${YELLOW}[*] Fase 5: Checking Security Headers${NC}"
-python3 header_checker.py "$DOMAIN" 2>&1 | tee -a "$LOG_FILE"
-
-# Fase 6: Analisis JavaScript dengan katana
-log "${YELLOW}[*] Fase 6: Analisis File JavaScript (Enhanced)${NC}"
-python3 js_analyzer.py "$DOMAIN" 2>&1 | tee -a "$LOG_FILE"
-
-# Ekstra: Fase nuclei scanning
-log "${YELLOW}[*] Fase Ekstra: Nuclei Template Scanning${NC}"
-if check_go_tool "nuclei"; then
-    nuclei -u "https://$DOMAIN" -o "$OUTPUT_DIR/nuclei_scan.txt" -silent 2>/dev/null &
-    log "${BLUE}[*] Nuclei scan berjalan di background${NC}"
-fi
-
-# Ringkasan
-log "${GREEN}[+] Scan selesai!${NC}"
-echo -e "\n${GREEN}════════════ HASIL SCAN ════════════${NC}"
-echo -e "Output disimpan di: ${BLUE}$OUTPUT_DIR${NC}"
-echo -e "File log: ${BLUE}$LOG_FILE${NC}"
-echo -e "\n${YELLOW}Tools Go yang digunakan:${NC}"
-ls $TOOLS_DIR | grep -E "(subfinder|assetfinder|httpx|gau|nuclei|ffuf|dalfox)" | xargs echo "  - "
-echo -e "\n${GREEN}Struktur hasil:${NC}"
-tree "$OUTPUT_DIR" 2>/dev/null || ls -la "$OUTPUT_DIR"
+# Run main function
+main "$@"
