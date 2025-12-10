@@ -1,0 +1,364 @@
+# 📁 **BUGHUNTERFLOW - DAFTAR TOOLS & CARA PAKAI**
+
+## **🎯 OVERVIEW**
+BugHunterFlow terdiri dari **1 script utama** + **6 script khusus** yang bekerja bersama. Semua dalam satu folder!
+
+---
+
+## **📋 DAFTAR FILE & KEGUNAAN**
+
+### **1. 🚀 `bughunter.sh` - SCRIPT UTAMA**
+**Kegunaan:** Menjalankan SEMUA tools secara otomatis berurutan  
+**Cara pakai:**
+```bash
+./bughunter.sh example.com
+```
+**Output:** Semua hasil di folder `output/example.com/`
+
+---
+
+### **2. 🔍 `reconnaissance.sh` - PENGINTAIAN**
+**Kegunaan:** Cari informasi target (subdomain, DNS, port, dll)  
+**Tools yang dipakai:**
+- `subfinder` - Cari subdomain
+- `assetfinder` - Cari aset lainnya
+- `httpx` - Cek host yang hidup
+- `nmap` - Scan port
+- `waybackurls` - Ambil URL sejarah
+
+**Cara pakai sendiri:**
+```bash
+./reconnaissance.sh example.com
+```
+**Output:** `output/example.com/recon/`
+
+---
+
+### **3. 🛠️ `web_tech.py` - ANALISIS TEKNOLOGI**
+**Kegunaan:** Deteksi teknologi yang dipakai website  
+**Yang dicek:**
+- Web server (Apache, Nginx, IIS)
+- Framework (WordPress, Laravel, Django, React)
+- WAF/CDN (Cloudflare, Akamai)
+- Bahasa pemrograman
+
+**Cara pakai sendiri:**
+```bash
+python3 web_tech.py example.com
+```
+**Output:** `output/example.com/web_tech.json`
+
+---
+
+### **4. 🔗 `param_finder.py` - CARI PARAMETER**
+**Kegunaan:** Temukan parameter & endpoint tersembunyi  
+**Tools yang dipakai:**
+- `gau` - Ambil URL dari berbagai sumber
+- `unfurl` - Ekstrak parameter dari URL
+- `gf` - Filter parameter menarik
+
+**Cara pakai sendiri:**
+```bash
+python3 param_finder.py example.com
+```
+**Output:**
+- `endpoints.txt` - Daftar endpoint
+- `parameters.txt` - Daftar parameter
+- `interesting_parameters.json` - Parameter berbahaya
+
+---
+
+### **5. 🐛 `bug_scanner.py` - SCAN VULNERABILITY**
+**Kegunaan:** Cari bug/kelemahan keamanan  
+**Tools yang dipakai:**
+- `nuclei` - Scan dengan template
+- `dalfox` - Cari XSS
+- `ffuf` - Fuzzing directory
+- Custom checks untuk: SQLi, IDOR, SSRF, RCE
+
+**Cara pakai sendiri:**
+```bash
+python3 bug_scanner.py example.com
+```
+**Output:** `bug_findings_enhanced.json`
+
+---
+
+### **6. 🔒 `header_checker.py` - CEK KEAMANAN HEADER**
+**Kegunaan:** Analisis security headers  
+**Yang dicek:**
+- `Content-Security-Policy` (CSP)
+- `X-Frame-Options`
+- `Strict-Transport-Security` (HSTS)
+- `X-Content-Type-Options`
+- Dan lainnya
+
+**Cara pakai sendiri:**
+```bash
+python3 header_checker.py example.com
+```
+**Output:** `security_headers_report.md` dengan rating
+
+---
+
+### **7. 📜 `js_analyzer.py` - ANALISIS JAVASCRIPT**
+**Kegunaan:** Cari rahasia di file JavaScript  
+**Yang dicari:**
+- API keys & tokens
+- Endpoint tersembunyi
+- URL internal
+- Informasi developer
+- Hardcoded credentials
+
+**Cara pakai sendiri:**
+```bash
+python3 js_analyzer.py example.com
+```
+**Output:** `js_analysis_enhanced.md`
+
+---
+
+## **🔄 CARA KERJA PIPELINE**
+```
+bughunter.sh
+    │
+    ├── reconnaissance.sh     (Fase 1: Pengintaian)
+    │
+    ├── web_tech.py           (Fase 2: Analisis Teknologi)
+    │
+    ├── param_finder.py       (Fase 3: Cari Parameter)
+    │
+    ├── bug_scanner.py        (Fase 4: Scan Bug)
+    │
+    ├── header_checker.py     (Fase 5: Cek Header)
+    │
+    └── js_analyzer.py        (Fase 6: Analisis JS)
+```
+
+---
+
+## **🎮 CARA JALANKAN PER FASE**
+
+### **OPTION 1: FULL AUTO (Pemula)**
+```bash
+# Satu perintah, semua jalan
+./bughunter.sh target.com
+```
+
+### **OPTION 2: MANUAL PER FASE (Expert)**
+```bash
+# 1. Buat folder output dulu
+mkdir -p output/target.com
+
+# 2. Jalankan fase per fase
+./reconnaissance.sh target.com
+python3 web_tech.py target.com
+python3 param_finder.py target.com
+python3 bug_scanner.py target.com
+python3 header_checker.py target.com
+python3 js_analyzer.py target.com
+```
+
+### **OPTION 3: FASE SPESIFIK**
+```bash
+# Hanya mau recon
+./reconnaissance.sh target.com
+
+# Hanya mau cari bug
+python3 bug_scanner.py target.com
+
+# Hanya mau cek JS
+python3 js_analyzer.py target.com
+```
+
+---
+
+## **⚙️ KONFIGURASI TOOLS GO**
+
+### **Tools yang diintegrasikan:**
+| Tool | Path | Untuk Apa |
+|------|------|-----------|
+| `subfinder` | `$HOME/go/bin/subfinder` | Cari subdomain |
+| `httpx` | `$HOME/go/bin/httpx` | Cek host hidup |
+| `nuclei` | `$HOME/go/bin/nuclei` | Scan vulnerability |
+| `ffuf` | `$HOME/go/bin/ffuf` | Fuzzing directory |
+| `gau` | `$HOME/go/bin/gau` | Kumpulkan URL |
+| `dalfox` | `$HOME/go/bin/dalfox` | Scan XSS |
+| `katana` | `$HOME/go/bin/katana` | Crawl website |
+| `waybackurls` | `$HOME/go/bin/waybackurls` | URL sejarah |
+
+### **Cek tools terinstall:**
+```bash
+# Lihat semua tools Go
+ls ~/go/bin/
+
+# Test masing-masing
+subfinder -d google.com -silent | head -3
+httpx -silent <<< "google.com"
+nuclei -version
+```
+
+---
+
+## **📊 HASIL SETIAP FASE**
+
+### **Setelah jalankan `./bughunter.sh target.com`:**
+```
+output/target.com/
+├── 📁 recon/                    ← reconnaissance.sh
+│   ├── subdomains_all.txt
+│   ├── live_subdomains.txt
+│   └── all_urls.txt
+│
+├── 📄 web_tech.json            ← web_tech.py
+├── 📄 endpoints.txt            ← param_finder.py
+├── 📄 parameters.txt           ← param_finder.py
+├── 📄 bug_findings.json        ← bug_scanner.py
+├── 📄 security_report.md       ← header_checker.py
+├── 📄 js_analysis.txt          ← js_analyzer.py
+└── 📄 scan_20251210_101228.log ← Log semua proses
+```
+
+---
+
+## **🕐 PERKIRAAN WAKTU**
+
+| Fase | Waktu | Output |
+|------|-------|--------|
+| Reconnaissance | 2-5 menit | Subdomain, URLs |
+| Technology Analysis | 1 menit | Teknologi website |
+| Parameter Discovery | 2-3 menit | Endpoint & parameter |
+| Bug Scanning | 3-10 menit | Vulnerability findings |
+| Security Headers | 30 detik | Security score |
+| JS Analysis | 2-5 menit | Secrets & endpoints |
+| **TOTAL** | **10-25 menit** | **Semua di atas** |
+
+---
+
+## **🔧 TROUBLESHOOTING PER TOOL**
+
+### **Jika `reconnaissance.sh` error:**
+```bash
+# Cek tools Go
+which subfinder httpx
+
+# Install jika missing
+go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+```
+
+### **Jika Python script error:**
+```bash
+# Cek Python version
+python3 --version
+
+# Install requirements
+pip3 install requests beautifulsoup4
+
+# Jalankan dengan debug
+python3 -m py_compile web_tech.py
+```
+
+### **Jika permission denied:**
+```bash
+chmod +x bughunter.sh reconnaissance.sh
+chmod +x *.py
+```
+
+---
+
+## **🎯 CONTOH KASUS PEMAKAIAN**
+
+### **Kasus 1: Pentester Pemula**
+```bash
+# Mau test website sendiri
+./bughunter.sh website-saya.com
+
+# Hasil: Tau semua vulnerability di website sendiri
+```
+
+### **Kasus 2: Bug Bounty Hunter**
+```bash
+# Fokus ke recon dan parameter
+./reconnaissance.sh target-bugbounty.com
+python3 param_finder.py target-bugbounty.com
+# Manual review hasilnya
+```
+
+### **Kasus 3: Security Assessment**
+```bash
+# Full assessment
+./bughunter.sh perusahaan-saya.com
+# Hasil lengkap untuk report ke management
+```
+
+---
+
+## **💡 TIPS PAKAI TOOLS**
+
+### **Untuk Target Besar:**
+```bash
+# Batasi scope
+./bughunter.sh target.com
+# Jika lama, tekan Ctrl+C, lanjut manual:
+python3 bug_scanner.py target.com
+```
+
+### **Untuk Target Kecil:**
+```bash
+# Full scan cepat
+./bughunter.sh testphp.vulnweb.com
+```
+
+### **Simpan Hasil:**
+```bash
+# Backup hasil
+tar -czf hasil_scan.tar.gz output/target.com/
+```
+
+---
+
+## **🚀 COMMAND CHEATSHEET**
+
+```bash
+# INSTALL
+git clone https://github.com/essev92-1/BugHunterFlow.git
+cd BugHunterFlow
+chmod +x *.sh *.py
+pip3 install requests beautifulsoup4
+
+# BASIC USAGE
+./bughunter.sh target.com                    # Full auto
+./reconnaissance.sh target.com               # Recon only
+python3 bug_scanner.py target.com           # Scan bug only
+
+# CHECK RESULTS
+cd output/target.com/
+ls -la
+cat web_tech.json
+cat bug_findings.json | jq '.'              # Pretty print JSON
+
+# DEBUG
+bash -x bughunter.sh target.com 2>&1 | tee debug.log
+tail -f output/target.com/scan_*.log
+```
+
+---
+
+## **📚 BELAJAR LEBIH LANJUT**
+
+### **Pahami setiap tool:**
+1. **Baca code** masing-masing `.py` file
+2. **Test per command** di terminal
+3. **Modifikasi** sesuai kebutuhan
+4. **Tambahkan tools** favorit Anda
+
+### **Resources:**
+- `man nmap` - Untuk port scanning
+- `subfinder -h` - Help subfinder
+- `nuclei -hu` - Template nuclei
+- Python `requests` library docs
+
+---
+
+**✨ SEMUA TOOLS SUDAH TERINTEGRASI!**  
+Cukup jalankan `./bughunter.sh target.com` dan tunggu hasilnya! 🚀
