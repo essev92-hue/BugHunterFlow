@@ -1,0 +1,16 @@
+# Output files
+output/
+*.log
+
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Temporary files
+*.tmp
+*.temp
+
+# IDE
+.vscode/
+.idea/
