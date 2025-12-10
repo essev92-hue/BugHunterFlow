@@ -34,7 +34,6 @@ EOF
 log() {
     echo -e "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
 }
-
 check_dependencies() {
     log "${BLUE}[*] Checking dependencies...${NC}"
     
@@ -86,6 +85,7 @@ main() {
     
     # Create output directory
     mkdir -p "$OUTPUT_DIR"
+    touch "$LOG_FILE"
     
     # Check dependencies
     check_dependencies
