@@ -1,0 +1,29 @@
+name: Test BugHunterFlow
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    
+    - name: Install Python dependencies
+      run: |
+        pip install requests beautifulsoup4
+        
+    - name: Make scripts executable
+      run: |
+        chmod +x *.sh
+        chmod +x *.py
+        
+    - name: Syntax check
+      run: |
+        python3 -m py_compile *.py
+        shellcheck *.sh || true
