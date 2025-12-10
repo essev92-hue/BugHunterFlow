@@ -29,13 +29,8 @@ source ~/.bashrc
 
 ### **LANGKAH 2: Download BugHunterFlow**
 ```bash
-# Download tools
 git clone https://github.com/essev92-hue/BugHunterFlow.git
-
-# Masuk ke folder
 cd BugHunterFlow
-
-# Beri permission
 chmod +x *.sh *.py
 ```
 
