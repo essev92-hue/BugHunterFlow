@@ -29,3 +29,11 @@ source ~/.bashrc
 
 # 3. Jalankan
 ./bughunter.sh example.com
+
+
+## Example Output
+[2023-12-10 16:30:28] [+] Starting BugHunterFlow for: example.com
+[2023-12-10 16:30:35] [+] Found 124 subdomains
+[2023-12-10 16:31:10] [+] Detected: Nginx, React, WordPress
+[2023-12-10 16:32:45] [+] Found 45 potential vulnerabilities
+...
