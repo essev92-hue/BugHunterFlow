@@ -121,7 +121,35 @@ ls -la
 **🚫 TEST TANPA IZIN = ILEGAL!**
 
 ---
+## ⚠️ DISCLAIMER & ETIKA PENGGUNAAN
 
+Tools ini dibuat untuk tujuan:
+- Pendidikan dan pembelajaran keamanan siber
+- Testing sistem yang ANDA MILIKI
+- Bug bounty dengan izin eksplisit
+- Penelitian keamanan yang legal
+
+### PERINGATAN:
+1. **JANGAN** gunakan untuk hacking ilegal
+2. **JANGAN** test website tanpa izin
+3. **JANGAN** gunakan untuk kejahatan siber
+4. **HANYA** gunakan di lingkungan yang Anda kuasai
+
+### TANGGUNG JAWAB:
+Penulis TIDAK bertanggung jawab atas:
+- Penyalahgunaan tools ini
+- Kerusakan sistem pihak lain
+- Konsekuensi hukum dari penggunaan ilegal
+- Kehilangan data atau kerugian finansial
+
+### ETIKA HACKING:
+1. Always get permission
+2. Respect privacy
+3. Don't destroy data
+4. Report vulnerabilities responsibly
+5. Help improve security
+
+**"With great power comes great responsibility"**
 ## 🔧 **SOLUSI MASALAH UMUM:**
 
 ### **Masalah: "bash: ./bughunter.sh: Permission denied"**
